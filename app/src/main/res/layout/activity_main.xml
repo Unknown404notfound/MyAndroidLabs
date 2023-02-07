@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:text="@string/spin_message"
-        app:layout_constraintBottom_toBottomOf="@+id/flagView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/flagView"
         app:layout_constraintTop_toTopOf="@+id/flagView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
