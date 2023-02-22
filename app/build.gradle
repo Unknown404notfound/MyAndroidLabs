@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'algonquin.cst2335.yang0212'
-    compileSdk 32
+    compileSdk 33
 
     buildFeatures {
         viewBinding true
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId "algonquin.cst2335.yang0212"
         minSdk 22
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
