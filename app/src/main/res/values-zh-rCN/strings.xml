@@ -3,4 +3,9 @@
     <string name="app_name">Yuxi\'s Android Labs</string>
     <string name="hello_message">你好，世界！</string>
     <string name="button_message">我是一个按钮</string>
+    <string name="button">按钮</string>
+    <string name="sendButton">发送</string>
+    <string name="receiveButton">接收</string>
+    <string name="inputText">消息在这儿</string>
+    <string name="currentTime">时间在这儿</string>
 </resources>
