@@ -1,18 +1,34 @@
 package algonquin.cst2335.yang0212;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.ArrayList;
 
-// store the data required for each message sent (message, time sent, and which button was clicked)
+@Entity //mark this as something that can go into a database
 public class ChatMessage {
 
-    String message;
-    String timeSent;
-    boolean isSentButton;
+    @PrimaryKey (autoGenerate = true)
+    @ColumnInfo(name="id") //specify that this variable will go into a database column named id
+    public int id;
+
+    @ColumnInfo(name="message")
+    protected String message;
+
+    @ColumnInfo(name="TimeSent")
+    protected String timeSent;
+
+    @ColumnInfo(name="SendOrReceive")
+    protected boolean isSentButton;
+
+
+    public ChatMessage() {}
 
     public ChatMessage(String m, String t, boolean sent) {
-        message = m;
-        timeSent = t;
-        isSentButton = sent;
+        this.message = m;
+        this.timeSent = t;
+        this.isSentButton = sent;
     }
     // getter for message
     public String getMessage() {
@@ -29,3 +45,6 @@ public class ChatMessage {
 
 
 }
+
+
+
