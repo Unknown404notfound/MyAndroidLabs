@@ -10,7 +10,7 @@ import java.util.List;
 @Dao
 public interface ChatMessageDAO {
     @Insert
-    void insertMessage(ChatMessage m);
+    public long insertMessage(ChatMessage m); // insert a ChatMessage object and then return the newly created ID as a long
 
     @Query("Select * from ChatMessage")
     public List<ChatMessage> getAllMessages();

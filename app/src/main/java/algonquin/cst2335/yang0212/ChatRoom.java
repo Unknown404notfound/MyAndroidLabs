@@ -86,7 +86,10 @@ public class ChatRoom extends AppCompatActivity {
 
             Executor thread_send = Executors.newSingleThreadExecutor();
             thread_send.execute(() ->{
-                mDAO.insertMessage(newMessage);
+                //store id of the new inserted message to variable id
+                long id = mDAO.insertMessage(newMessage);
+                //set the id to the value stored in id variable
+                newMessage.id = (int)id;
             });
             // notify entire ArrayList has changed
             myAdapter.notifyDataSetChanged();
@@ -114,7 +117,9 @@ public class ChatRoom extends AppCompatActivity {
 
             Executor thread = Executors.newSingleThreadExecutor();
             thread.execute(() ->{
-               mDAO.insertMessage(newMessage);
+               //mDAO.insertMessage(newMessage);
+                long id = mDAO.insertMessage(newMessage);
+                newMessage.id = (int)id;
             });
 
             myAdapter.notifyDataSetChanged();
@@ -196,11 +201,17 @@ public class ChatRoom extends AppCompatActivity {
                         .setTitle("Question: ") //set the title of the alert dialog
                         .setPositiveButton("Yes", (dialog, cl) -> {
                             ChatMessage m = messages.get(position);
+
+                            //ChatMessage newMessage = new ChatMessage(message, currentDateandTime, false);
+
                             thread.execute(() ->
                             {mDAO.deleteMessage(m);
                             });
                             ChatMessage removedMessage = messages.remove(position);
                             myAdapter.notifyItemRemoved(position);
+
+
+
 
                             Snackbar.make(messageText, "You deleted message #" + position, Snackbar.LENGTH_LONG)
                             .setAction("Undo",click -> {
