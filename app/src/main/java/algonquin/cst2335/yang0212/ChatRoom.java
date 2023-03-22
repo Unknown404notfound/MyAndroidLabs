@@ -68,6 +68,22 @@ public class ChatRoom extends AppCompatActivity {
         binding = ActivityChatRoomBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // register as a listener to the MutableLiveData object
+        chatModel.selectedMessage.observe(this, (newMessageValue) -> {
+            // load a Fragment
+            MessageDetailsFragment chatFragment = new MessageDetailsFragment(newMessageValue);
+            //FragmentManager fMgr = getSupportFragmentManager();
+            //FragmentTransaction tx = fMgr.beginTransaction();
+            //tx.add(R.id.fragmentLocation, chatFragment);
+            //tx.commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentLocation, chatFragment)
+                    // adds the transaction to the stack of pages to undo by pressing the back arrow.
+                    .addToBackStack("")
+                    .commit();
+        });
+
         //  a click listener to the send button
         binding.sendButton.setOnClickListener(click -> {
 
@@ -192,42 +208,48 @@ public class ChatRoom extends AppCompatActivity {
 
             itemView.setOnClickListener(clk -> {
                 int position = getAbsoluteAdapterPosition();
+                // find the selected chat message
+                ChatMessage selected = messages.get(position);
+                // post that value to the selectedMessage variable
+                chatModel.selectedMessage.postValue(selected);
 
-                Executor thread = Executors.newSingleThreadExecutor();
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(ChatRoom.this);
-
-                builder.setMessage("Do you want to delete this message: " + messageText.getText()) //set the message on the alert window
-                        .setTitle("Question: ") //set the title of the alert dialog
-                        .setPositiveButton("Yes", (dialog, cl) -> {
-                            ChatMessage m = messages.get(position);
-
-                            //ChatMessage newMessage = new ChatMessage(message, currentDateandTime, false);
-
-                            thread.execute(() ->
-                            {mDAO.deleteMessage(m);
-                            });
-                            ChatMessage removedMessage = messages.remove(position);
-                            myAdapter.notifyItemRemoved(position);
-
-
-
-
-                            Snackbar.make(messageText, "You deleted message #" + position, Snackbar.LENGTH_LONG)
-                            .setAction("Undo",click -> {
-                                thread.execute(() ->
-                                {mDAO.insertMessage(m);
-                                });
-                                messages.add(position,removedMessage);
-                                myAdapter.notifyItemInserted(position);
-                            })
-                                    .show();
-
-                        })
-                        .setNegativeButton("No", (dialog, cl) -> {
-                        })
-
-                        .create().show();
+//                int position = getAbsoluteAdapterPosition();
+//
+//                Executor thread = Executors.newSingleThreadExecutor();
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(ChatRoom.this);
+//
+//                builder.setMessage("Do you want to delete this message: " + messageText.getText()) //set the message on the alert window
+//                        .setTitle("Question: ") //set the title of the alert dialog
+//                        .setPositiveButton("Yes", (dialog, cl) -> {
+//                            ChatMessage m = messages.get(position);
+//
+//                            //ChatMessage newMessage = new ChatMessage(message, currentDateandTime, false);
+//
+//                            thread.execute(() ->
+//                            {mDAO.deleteMessage(m);
+//                            });
+//                            ChatMessage removedMessage = messages.remove(position);
+//                            myAdapter.notifyItemRemoved(position);
+//
+//
+//
+//
+//                            Snackbar.make(messageText, "You deleted message #" + position, Snackbar.LENGTH_LONG)
+//                            .setAction("Undo",click -> {
+//                                thread.execute(() ->
+//                                {mDAO.insertMessage(m);
+//                                });
+//                                messages.add(position,removedMessage);
+//                                myAdapter.notifyItemInserted(position);
+//                            })
+//                                    .show();
+//
+//                        })
+//                        .setNegativeButton("No", (dialog, cl) -> {
+//                        })
+//
+//                        .create().show();
             });
 
             messageText = itemView.findViewById(R.id.message);
