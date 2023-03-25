@@ -1,8 +1,10 @@
 package algonquin.cst2335.yang0212;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,6 +14,8 @@ import androidx.room.Room;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -37,7 +41,6 @@ public class ChatRoom extends AppCompatActivity {
     RecyclerView.Adapter myAdapter;
     ArrayList<ChatMessage> messages;
     ChatMessageDAO mDAO;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,9 @@ public class ChatRoom extends AppCompatActivity {
 
         binding = ActivityChatRoomBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+       setSupportActionBar(binding.myToolbar);
 
         // register as a listener to the MutableLiveData object
         chatModel.selectedMessage.observe(this, (newMessageValue) -> {
@@ -196,6 +202,31 @@ public class ChatRoom extends AppCompatActivity {
         });
     }
 
+    // load a Menu layout file
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.my_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch( item.getItemId() )
+        {
+
+            case R.id.item_1:
+                mDAO.deleteMessage(chatModel.selectedMessage.getValue());
+
+
+
+                break;
+        }
+
+        return true;
+        // return super.onOptionsItemSelected(item);
+    }
 
     class MyRowHolder extends RecyclerView.ViewHolder {
         public TextView messageText;

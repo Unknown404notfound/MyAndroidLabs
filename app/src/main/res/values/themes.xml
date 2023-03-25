@@ -10,5 +10,9 @@
         <!-- Customize your theme here. -->
         <!-- text color. -->
         <item name="android:textColor">@color/my_text</item>
+
+        <!-- tell Android not to use ActionBar. -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 </resources>
