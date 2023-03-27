@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -41,6 +44,8 @@ public class ChatRoom extends AppCompatActivity {
     RecyclerView.Adapter myAdapter;
     ArrayList<ChatMessage> messages;
     ChatMessageDAO mDAO;
+
+    // public TextView messageText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,22 +77,30 @@ public class ChatRoom extends AppCompatActivity {
         setContentView(binding.getRoot());
 
 
-       setSupportActionBar(binding.myToolbar);
+        setSupportActionBar(binding.myToolbar);
 
         // register as a listener to the MutableLiveData object
         chatModel.selectedMessage.observe(this, (newMessageValue) -> {
             // load a Fragment
-            MessageDetailsFragment chatFragment = new MessageDetailsFragment(newMessageValue);
+
             //FragmentManager fMgr = getSupportFragmentManager();
             //FragmentTransaction tx = fMgr.beginTransaction();
             //tx.add(R.id.fragmentLocation, chatFragment);
             //tx.commit();
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentLocation, chatFragment)
-                    // adds the transaction to the stack of pages to undo by pressing the back arrow.
-                    .addToBackStack("")
-                    .commit();
+            if (newMessageValue != null) {
+                MessageDetailsFragment chatFragment = new MessageDetailsFragment(newMessageValue);
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentLocation, chatFragment)
+                        // adds the transaction to the stack of pages to undo by pressing the back arrow.
+                        .addToBackStack("")
+                        .commit();
+            } else {
+                // If selectedMessage was deleted, remove the fragment
+                getSupportFragmentManager().popBackStack();
+
+            }
+
         });
 
         //  a click listener to the send button
@@ -107,11 +120,11 @@ public class ChatRoom extends AppCompatActivity {
             messages.add(newMessage);
 
             Executor thread_send = Executors.newSingleThreadExecutor();
-            thread_send.execute(() ->{
+            thread_send.execute(() -> {
                 //store id of the new inserted message to variable id
                 long id = mDAO.insertMessage(newMessage);
                 //set the id to the value stored in id variable
-                newMessage.id = (int)id;
+                newMessage.id = (int) id;
             });
             // notify entire ArrayList has changed
             myAdapter.notifyDataSetChanged();
@@ -138,10 +151,10 @@ public class ChatRoom extends AppCompatActivity {
             messages.add(newMessage);
 
             Executor thread = Executors.newSingleThreadExecutor();
-            thread.execute(() ->{
-               //mDAO.insertMessage(newMessage);
+            thread.execute(() -> {
+
                 long id = mDAO.insertMessage(newMessage);
-                newMessage.id = (int)id;
+                newMessage.id = (int) id;
             });
 
             myAdapter.notifyDataSetChanged();
@@ -213,19 +226,51 @@ public class ChatRoom extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch( item.getItemId() )
-        {
+        switch (item.getItemId()) {
 
             case R.id.item_1:
-                mDAO.deleteMessage(chatModel.selectedMessage.getValue());
+
+                ChatMessage m = chatModel.selectedMessage.getValue();
+                if (m != null) {
+                    Executor thread = Executors.newSingleThreadExecutor();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ChatRoom.this);
+
+                    builder.setMessage("Do you want to delete this message: " + chatModel.selectedMessage.getValue().getMessage()) //set the message on the alert window
+                            .setTitle("Question: ") //set the title of the alert dialog
+                            .setPositiveButton("Yes", (dialog, cl) -> {
+
+                                thread.execute(() -> {
+                                    mDAO.deleteMessage(m);
+                                });
+                                int position = messages.indexOf(m);
+                                //messages.remove(m);
+                                messages.remove(position);
+                                myAdapter.notifyItemRemoved(position);
+                                chatModel.selectedMessage.setValue(null); // Clear the selected message
+                            })
 
 
+                            .setNegativeButton("No", (dialog, cl) -> {
+                            })
 
+                            .create().show();
+                }
+
+                break;
+            case R.id.item_2:
+                Context context = getApplicationContext();
+                CharSequence text = "Version 1.0, created by Yuxi Yang";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                break;
+            default:
                 break;
         }
 
         return true;
-        // return super.onOptionsItemSelected(item);
     }
 
     class MyRowHolder extends RecyclerView.ViewHolder {
